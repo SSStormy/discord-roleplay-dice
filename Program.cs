@@ -26,8 +26,8 @@ namespace droll
     {
         static void Main(string[] args)
         {
-            Entry(JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"))).ContinueWith((t)
-                    =>
+            Task.Run(() => Entry(JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"))).ContinueWith((t)
+                =>
             {
                 if (t.Exception == null) return;
 
@@ -35,7 +35,32 @@ namespace droll
                 {
                     ExceptionDispatchInfo.Capture(ex).Throw();
                 }
-            }).GetAwaiter().GetResult();
+            }));
+
+            while (true)
+            {
+                Console.WriteLine("Waiting for roll...");
+                var input = Console.ReadLine();
+                try
+                {
+                    Console.WriteLine($"Rolling {input}");
+                    foreach (var result in Roll.Execute(input))
+                    {
+                        Console.Write($">> {result.Dice.Times}d{result.Dice.Sides} ");
+                        if(result.Rolls.Count > 1)
+                            Console.Write("--> ");
+                            foreach (var roll in result.Rolls)
+                                Console.Write($"{roll} ");
+
+                        Console.Write($"--> {result.Rolls.Select(e => e.Result).Sum()}{Environment.NewLine}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception: {ex}");
+                }
+
+            }
         }
 
         private static async Task Entry(Config cfg)

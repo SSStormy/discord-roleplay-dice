@@ -253,5 +253,17 @@ namespace droll
         }
 
         public static List<Expr> Parse(string query) => new Parser(new Lexer(query)).GetExpressions();
+
+        public static IEnumerable<DiceResult> Execute(string query)
+        {
+            var expr = Parse(query);
+            var rng = new Random();
+            var results = new List<DiceResult>(expr.Count);
+
+            foreach (var ex in expr)
+                results.AddRange(ex.Execute(rng));
+
+            return results;
+        }
     }
 }
