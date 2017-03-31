@@ -132,7 +132,7 @@ namespace droll
                     }
 
                     if (roll.Rolls.Count == 1 || _idx >= roll.Rolls.Count)
-                        sb.Append($"{arrow} {roll.Rolls.Sum()}");
+                        sb.Append($"{arrow} {roll.Rolls.Select(s => s.Result).Sum()}");
 
                     sb.Append(Environment.NewLine);
                 }
