@@ -18,9 +18,8 @@ namespace droll
 
             public override IEnumerable<DiceResult> Execute(Random rng)
             {
-                var repr = GetRepresentation(Times, Dice.Sides);
                 for (var i = 0; i < Times; i++)
-                    yield return new DiceResult(rng, Dice);
+                    yield return new DiceResult(rng, Dice, Dice.Mod);
             }
         }
     }

@@ -97,8 +97,6 @@ namespace droll
 
         public abstract class Expr
         {
-            protected string GetRepresentation(int times, int sides) => $"{times}d{sides}";
-
             public abstract IEnumerable<DiceResult> Execute(Random rng);
         }
 
@@ -154,10 +152,13 @@ namespace droll
                 // d20
                 // 3d20
                 const string dString = "d";
+                const string plusString = "+";
                 const int timesMin = 1;
                 const int timesMax = 20;
                 const int sidesMin = 2;
                 const int sidesMax = 100;
+                const int modMin = 1;
+                const int modMax = 100;
 
                 var times = 1;
 
@@ -171,7 +172,16 @@ namespace droll
                 var sides = ParseNumberToken(MatchNext(Token.TokenType.Number), sidesMin, sidesMax);
                 _idx++;
 
-                return new DiceExpr(times, sides);
+                // check if we have a plus token at the end
+                var mod = 0;
+                if (!IsEof && Current.Type == Token.TokenType.Symbol &&
+                    Current.Data.Equals(plusString, StringComparison.OrdinalIgnoreCase))
+                {
+                    mod = ParseNumberToken(MatchNext(Token.TokenType.Number), modMin, modMax);
+                    _idx++;
+                }
+
+                return new DiceExpr(times, sides, mod);
             }
 
             private MulExpr Mul()
@@ -223,7 +233,7 @@ namespace droll
                         retval.Add(val);
                         success = true;
                     }
-                    catch (ParseException)
+                    catch (Exception ex) when (ex is ParseException)  
                     {
                         _idx = prevIdx;
                     }

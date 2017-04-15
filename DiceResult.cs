@@ -41,13 +41,13 @@ namespace droll
 
         public class DiceResult
         {
-            public DiceResult(Random rng, DiceExpr dice)
+            public DiceResult(Random rng, DiceExpr dice, int mod)
             {
                 Dice = dice;
 
                 var rolls = new RollResult[dice.Times];
                 for (var i = 0; i < dice.Times; i++)
-                    rolls[i] = new RollResult(dice, rng.Next(1, dice.Sides + 1));
+                    rolls[i] = new RollResult(dice, rng.Next(1, dice.Sides + 1) + mod);
 
                 Rolls = rolls;
             }
